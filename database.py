@@ -27,8 +27,7 @@ class FinanceManager:
         self.conn.commit()
 
     def get_current_month_income(self):
-        mes = datetime.now().strftime('%m')
-        ano = datetime.now().strftime('%Y')
+        mes, ano = datetime.now().strftime('%m'), datetime.now().strftime('%Y')
         self.cursor.execute("SELECT description, value, date FROM transactions WHERE type='receita' AND category='renda' AND strftime('%m', date) = ? AND strftime('%Y', date) = ?", (mes, ano))
         return self.cursor.fetchall()
 
@@ -50,13 +49,11 @@ class FinanceManager:
         self.cursor.execute("SELECT SUM(value) FROM transactions WHERE type='despesa'")
         despesas = self.cursor.fetchone()[0] or 0.0
         total_global = receitas - despesas
-        
         self.cursor.execute("SELECT SUM(current_amount) FROM goals")
         total_allocated = self.cursor.fetchone()[0] or 0.0
-        
         return {
-            "total_global": total_global, 
-            "total_allocated": total_allocated, # Chave restaurada
-            "free_balance": total_global - total_allocated, 
+            "total_global": total_global,
+            "total_allocated": total_allocated,
+            "free_balance": total_global - total_allocated,
             "monthly_cost": self.get_monthly_cost()
         }
